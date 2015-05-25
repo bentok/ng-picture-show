@@ -2,11 +2,11 @@
 
 angular
   .module('slideshow', ['ngAnimate', 'ngTouch'])
-  .directive('slideshow', ['$interval', slideshowDirective]);
+  .directive('slideshow', ['$interval', '$timeout', slideshowDirective]);
 
-function slideshowDirective($interval){
+function slideshowDirective($interval, $timeout){
   return {
-    restrict: 'A',
+    restrict: 'EA',
     scope: {
       data: '='
     },
@@ -14,11 +14,10 @@ function slideshowDirective($interval){
     link: linkFunction
   };
 
-  function linkFunction(scope){
+  function linkFunction(scope, element){
     // scope variables
     var vm = scope;
     vm.slides = vm.data; // Slides object returned from controller if "data" attribute is set to "slides" in controller
-    vm.slideIndex = 0;
     var i = 0;
     vm.slides[0].show = true;
 
@@ -43,9 +42,11 @@ function slideshowDirective($interval){
             i = vm.slides.length -1;
           }
         } else {
+          // increment at interval when no argument is passed
           i++;
         }
       } else {
+        // reset slideshow when transitioning from last slide
         for (var k = 0; k < vm.slides.length; k++) {
           vm.slides[k].show = false;
         }
@@ -62,6 +63,12 @@ function slideshowDirective($interval){
     function prevSlide() {
       startSlideshow('prev');
     }
+
+    $timeout(function(){
+      var slideHeight = element.children()[0].offsetHeight;
+      element.parent().css('height', slideHeight);
+    }, 1000);
+
 
   }
 
