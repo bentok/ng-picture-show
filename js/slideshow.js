@@ -64,11 +64,21 @@ function slideshowDirective($interval, $timeout){
       startSlideshow('prev');
     }
 
-    $timeout(function(){
-      var slideHeight = element.children()[0].offsetHeight;
-      element.parent().css('height', slideHeight);
-    }, 1000);
+    // Check for height until DOM is ready
+    function setSlideshowHeight(){
+      $timeout(function(){
+        var slideHeight = element.children()[0].offsetHeight;
+        if (slideHeight) {
+          element[0].parentNode.style.height = slideHeight + 'px';
+        } else {
+          setSlideshowHeight();
+        }
+      }, 100);
+    }
+    setSlideshowHeight();
 
+    // Get slideshow height again if orientation changes
+    window.addEventListener('orientationchange', setSlideshowHeight);
 
   }
 
